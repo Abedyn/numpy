@@ -51,7 +51,8 @@ This flag is checked at import time.
 SIMD feature selection
 ----------------------
 
-Setting ``NPY_DISABLE_CPU_FEATURES`` will exclude simd features at runtime.
+Setting ``NPY_DISABLE_CPU_FEATURES`` or ``NPY_ENABLE_CPU_FEATURES`` will
+respectively exclude or restrict dispatched SIMD features at runtime.
 See :ref:`runtime-simd-dispatch`.
 
 

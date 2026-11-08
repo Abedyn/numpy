@@ -463,16 +463,34 @@ Runtime Dispatch
 ----------------
 
 Importing NumPy triggers a scan of the available CPU features from the set
-of dispatchable features. You can restrict this scan by setting the
-environment variable ``NPY_DISABLE_CPU_FEATURES`` to a comma-, tab-, or
-space-separated list of features to disable. 
+of dispatchable features. You can control which dispatchable features are
+used at runtime by setting either ``NPY_DISABLE_CPU_FEATURES`` or
+``NPY_ENABLE_CPU_FEATURES`` to a comma-, tab-, or space-separated list of
+feature names:
 
-For instance, on ``x86_64`` this will disable ``X86_V4``::
+- ``NPY_DISABLE_CPU_FEATURES`` disables the specified dispatchable features.
+  For instance, on ``x86_64`` this disables ``X86_V4``::
 
-    NPY_DISABLE_CPU_FEATURES="X86_V4"
+      NPY_DISABLE_CPU_FEATURES="X86_V4"
 
-This will raise an error if parsing fails or if the feature was not enabled through the ``cpu-dispatch`` build option.
-If the feature is supported by the build but not available on the current CPU, a warning will be emitted instead.
+- ``NPY_ENABLE_CPU_FEATURES`` enables *only* the specified dispatchable
+  features (in addition to baseline features, which are always enabled) and
+  disables all other dispatchable features. For instance, on ``x86_64`` this
+  restricts dispatched features to ``X86_V3``::
+
+      NPY_ENABLE_CPU_FEATURES="X86_V3"
+
+Note the following runtime behaviors:
+
+- Setting both ``NPY_DISABLE_CPU_FEATURES`` and ``NPY_ENABLE_CPU_FEATURES``
+  simultaneously raises an :exc:`ImportError`.
+- Attempting to disable a baseline feature (configured via ``cpu-baseline``)
+  with ``NPY_DISABLE_CPU_FEATURES`` raises a :exc:`RuntimeError`.
+- Attempting to enable a feature with ``NPY_ENABLE_CPU_FEATURES`` that is not
+  supported by the current CPU raises a :exc:`RuntimeError`.
+- Specifying a feature that was not built as part of ``cpu-dispatch`` (or when
+  NumPy was built without dispatched optimizations) emits an
+  :exc:`ImportWarning`.
 
 Tracking Dispatched Functions
 -----------------------------
